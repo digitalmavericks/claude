@@ -52,16 +52,22 @@ def seed_skill(
     """Seed a single skill into the population database."""
     client = get_client()
 
-    existing = get_top_prompts(client, skill_name, limit=1)
-    if existing:
-        logger.info(f"Skill '{skill_name}' already has {len(existing)} prompts in population — skipping seed")
-        return {"skill": skill_name, "action": "skipped", "existing_count": len(existing)}
-
     prompt_text = load_skill_prompt(skill_name)
     task_types = SKILL_TASK_TYPES.get(skill_name, ["general"])
 
+    existing = get_top_prompts(client, skill_name, limit=100)
+    existing_task_types = {p["task_type"] for p in existing}
+    remaining = [t for t in task_types if t not in existing_task_types]
+
+    if not remaining:
+        logger.info(f"Skill '{skill_name}' fully seeded ({len(existing)} prompts) — skipping")
+        return {"skill": skill_name, "action": "skipped", "existing_count": len(existing)}
+
+    if existing_task_types:
+        logger.info(f"Skill '{skill_name}' partially seeded ({len(existing_task_types)}/{len(task_types)}), seeding {len(remaining)} remaining")
+
     results = []
-    for task_type in task_types:
+    for task_type in remaining:
         score = 0.0
         score_breakdown = {}
 
