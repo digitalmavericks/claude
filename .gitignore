@@ -1,0 +1,17 @@
+.env
+.env.slack
+.env.*
+!.env.example
+!.env*.example
+venv-slack/
+__pycache__/
+*.pyc
+*.pyo
+logs/
+soul_proposals/
+.soul_proposals/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
