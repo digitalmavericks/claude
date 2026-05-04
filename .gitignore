@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+logs/
+soul_proposals/
+.soul_proposals/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
