@@ -1,0 +1,192 @@
+{
+  "name": "AML Webinar Stayed Till CTA (121 mins) to PAP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aml-webinar-stayed-till-cta",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Aevent Stayed Till CTA Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "aml-stayed-cta"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://rest.gohighlevel.com/v1/contacts/lookup?email={{ encodeURIComponent($json.email) }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "ghl-lookup-contact",
+      "name": "Lookup GHL Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GHL-API-Key",
+          "name": "GHL API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://rest.gohighlevel.com/v1/contacts/{{ $('Lookup GHL Contact').json.contacts[0].id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tags\": [\"AML-Webinar-Stayed-Till-CTA\", \"AML-Stealth\", \"AML-Engaged\", \"AML-Warm-Lead\"],\n  \"customField\": {\n    \"stayed_till_cta_at\": \"{{ $now.toISO() }}\",\n    \"watch_time_minutes\": \"{{ $json.watch_time || $json.watchTime || '121+' }}\",\n    \"webinar_engagement\": \"Full-Watch-To-CTA\"\n  }\n}",
+        "options": {}
+      },
+      "id": "ghl-update-contact",
+      "name": "Update GHL Contact - Stayed Till CTA Tag",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GHL-API-Key",
+          "name": "GHL API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "contact-exists",
+              "leftValue": "={{ $json.contacts?.length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-contact-exists",
+      "name": "Contact Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [570, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rest.gohighlevel.com/v1/contacts/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\": \"{{ $('Aevent Stayed Till CTA Webhook').json.email }}\",\n  \"firstName\": \"{{ $('Aevent Stayed Till CTA Webhook').json.first_name || '' }}\",\n  \"lastName\": \"{{ $('Aevent Stayed Till CTA Webhook').json.last_name || '' }}\",\n  \"tags\": [\"AML-Webinar-Stayed-Till-CTA\", \"AML-Stealth\", \"AML-Engaged\", \"AML-Warm-Lead\"],\n  \"source\": \"Aevent Webinar\",\n  \"customField\": {\n    \"stayed_till_cta_at\": \"{{ $now.toISO() }}\",\n    \"webinar_engagement\": \"Full-Watch-To-CTA\"\n  }\n}",
+        "options": {}
+      },
+      "id": "ghl-create-new",
+      "name": "Create New GHL Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 450],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GHL-API-Key",
+          "name": "GHL API Key"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Aevent Stayed Till CTA Webhook": {
+      "main": [
+        [
+          {
+            "node": "Lookup GHL Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup GHL Contact": {
+      "main": [
+        [
+          {
+            "node": "Contact Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Exists?": {
+      "main": [
+        [
+          {
+            "node": "Update GHL Contact - Stayed Till CTA Tag",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create New GHL Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "instanceId": "aml-webinar-suite"
+  },
+  "tags": [
+    {
+      "name": "AML-Webinar"
+    },
+    {
+      "name": "Aevent"
+    },
+    {
+      "name": "GHL"
+    }
+  ]
+}
