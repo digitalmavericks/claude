@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.digitalmavericks.network-failover-watchdog</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/echo/Documents/Claude/Projects/ECHO/launchd/network-failover-watchdog.sh</string>
+    </array>
+
+    <!--
+      This is a LaunchDaemon (lives in /Library/LaunchDaemons), so it runs as
+      root at boot WITHOUT any user logged in — the exact state the Mac is in
+      after a power blip or uplink drop.
+
+      RunAtLoad   : check immediately on boot.
+      StartInterval: re-check every 120s so an outage is caught within ~2 min
+                     instead of going unnoticed for days.
+    -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StartInterval</key>
+    <integer>120</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/echo/Library/Logs/digitalmavericks/network-failover-watchdog.stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/echo/Library/Logs/digitalmavericks/network-failover-watchdog.stderr.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
