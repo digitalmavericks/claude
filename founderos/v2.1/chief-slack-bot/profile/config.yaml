@@ -1,0 +1,8 @@
+# Valid Hermes profile settings used only to isolate any subprocess home/cwd.
+# Intentionally absent: model, provider, fallback, gateway, messaging, cron,
+# toolset, or LLM credentials. The install pack never starts a Hermes gateway.
+terminal:
+  backend: local
+  cwd: ${CHIEF_PROFILE_HOME}
+  home_mode: profile
+  env_passthrough: []

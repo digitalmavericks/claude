@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Managed by FounderOS CHIEF Slack identity pack -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.digitalmavericks.chief-slack-events</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__PYTHON3__</string>
+    <string>__PROFILE_HOME__/events-bridge/server.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__PROFILE_HOME__</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>CHIEF_PROFILE_HOME</key>
+    <string>__PROFILE_HOME__</string>
+    <key>HERMES_ROOT_ENV</key>
+    <string>__HERMES_ENV_FILE__</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>StandardOutPath</key>
+  <string>__PROFILE_HOME__/logs/events-bridge.log</string>
+  <key>StandardErrorPath</key>
+  <string>__PROFILE_HOME__/logs/events-bridge.error.log</string>
+</dict>
+</plist>
